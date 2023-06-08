@@ -1,0 +1,9 @@
+#!/usr/bin/python3
+import hidden_4
+if __name__ == "__main__":
+    list = []
+    for x in dir(hidden_4):
+        if x[0] != '_':
+            list.append(x)
+    for x in list:
+        print(x)
