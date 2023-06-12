@@ -2,8 +2,7 @@
 #include <stdlib.h>
 
 /**
- * reverse_array - reverses the content of an array of integers
- * to check palindrome
+ * reverse_array - reverses content of an array of integers
  * @a: int array to reverse
  * @n: number of elements in array
  * Return: concatenated string
@@ -11,23 +10,23 @@
 
 void reverse_array(int *a, int n)
 {
-        int *start = a;
+        int *begin = a;
         int *end;
-        int hold = 0;
+        int temp = 0;
 
         end = a + n - 1;
-        for (; start < end; start++, end--)
+        for (; begin < end; begin++, end--)
         {
-                hold = *end;
-                *end = *start;
-                *start = hold;
+                temp = *end;
+                *end = *begin;
+                *begin = temp;
         }
 }
 
 /**
- * is_palindrome - if palindrome return 1, 0 if not
+ * is_palindrome - Return 1 if palindrome, 0 if not
  * @head: linked list
- * Return: if palindrome return 1, 0 if not
+ * Return: Return 1 if palindrome, 0 if not
  */
 
 int is_palindrome(listint_t **head)
