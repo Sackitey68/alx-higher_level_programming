@@ -1,133 +1,155 @@
 #!/usr/bin/python3
-""" Rectangle that inherits Base """
-from models.base import Base
+"""
+File: base.py
+Desc: THis module contains a class; Base
+"""
 
+import csv
+import random
+import json
+import turtle
 
-class Rectangle(Base):
-    """ Rectangle that inherits Base """
-    def __init__(self, width, height, x=0, y=0, id=None):
-        super().__init__(id)
-        self.width = width
-        self.height = height
-        self.x = x
-        self.y = y
+class Base:
+    """
+    Representation of the class Base
+    """
 
-    @property
-    def width(self):
-        """ returns width value"""
-        return self.__width
+    __nb_objects = 0
 
-    @width.setter
-    def width(self, value):
-        """ sets width value """
-        if type(value) is not int:
-            raise TypeError("width must be an integer")
-        if value <= 0:
-            raise ValueError("width must be > 0")
-        self.__width = value
-
-    @property
-    def height(self):
+    def __init__(self, id=None):
         """
-        returns height value
+        Initialization of the class
         """
-        return self.__height
+        if id is not None:
+            self.id = id
+        else:
+            Base.__nb_objects += 1
+            self.id = self.__nb_objects
 
-    @height.setter
-    def height(self, value):
+    @staticmethod
+    def to_json_string(list_dictionaries):
         """
-        sets height value
+        Returns the JSON string representation of list_dictionaries
         """
-        if type(value) is not int:
-            raise TypeError("height must be an integer")
-        elif value <= 0:
-            raise ValueError("height must be > 0")
-        self.__height = value
+        if list_dictionaries is None:
+            list_dictionaries = []
+        return json.dumps(list_dictionaries)
 
-    @property
-    def x(self):
+    @classmethod
+    def save_to_file(cls, list_objs):
         """
-        returns x value
+        Writes the JSON string representation of list_objs to a file
         """
-        return self.__x
+        filename = cls.__name__ + ".json"
+        objl = []
+        if list_objs is not None:
+            for i in list_objs:
+                objl.append(cls.to_dictionary(i))
+        with open(filename, "w", encoding="UTF-8") as f:
+            f.write(cls.to_json_string(objl))
 
-    @x.setter
-    def x(self, value):
+    @staticmethod
+    def from_json_string(json_string):
         """
-        sets x value
+        Returns the list of the JSON string representation json_string
         """
-        if type(value) is not int:
-            raise TypeError("x must be an integer")
-        elif value < 0:
-            raise ValueError("x must be >= 0")
-        self.__x = value
+        if json_string is None or len(json_string) == 0:
+            return []
+        return json.loads(json_string)
 
-    @property
-    def y(self):
+    @classmethod
+    def create(cls, **dictionary):
         """
-        returns y value
+        Returns an instance with all attributes already set
         """
-        return self.__y
+        if cls.__name__ == "Rectangle":
+            hold = cls(2, 2)
+        elif cls.__name__ == "Square":
+            hold = cls(2)
+        hold.update(**dictionary)
+        return hold
 
-    @y.setter
-    def y(self, value):
+    @classmethod
+    def load_from_file(cls):
         """
-        sets y value
+        Returns a list of instances
         """
-        if type(value) is not int:
-            raise TypeError("y must be an integer")
-        elif value < 0:
-            raise ValueError("y must be >= 0")
-        self.__y = value
+        filename = cls.__name__ + ".json"
+        listo = []
+        try:
+            with open(filename, "r", encoding="UTF-8") as f:
+                listo = cls.from_json_string(f.read())
+                for n, objs in enumerate(listo):
+                    listo[n] = cls.create(**listo[n])
+        except Exception:
+            pass
+        return listo
 
-    def area(self):
+    @classmethod
+    def save_to_file_csv(cls, list_objs):
         """
-        area of a rectangle
+        Saves a list of rectangles/squares as a csv file
         """
-        return self.__height * self.__width
+        filename = cls.__name__ + ".csv"
+        with open(filename, "w", newline='', encoding="UTF-8") as csvfile:
+            csv_writer = csv.writer(csvfile)
+            if cls.__name__ == "Rectangle":
+                for obj in list_objs:
+                    csv_writer.writerow([obj.id, obj.width, obj.height,
+                                         obj.x, obj.y])
+            elif cls.__name__ == "Square":
+                for obj in list_objs:
+                    csv_writer.writerow([obj.id, obj.size, obj.x, obj.y])
 
-    def display(self):
-        """ display """
-        for v_shift in range(self.__y):
-            print()
-        for height in range(self.__height):
-            print(" " * self.__x + "#" * self.__width)
+    @classmethod
+    def load_from_file_csv(cls):
+        """
+        Loads from csv
+        """
+        filename = cls.__name__ + ".csv"
+        li = []
+        try:
+            with open(filename, "r", encoding="UTF-8") as csvfile:
+                csv_reader = csv.reader(csvfile)
+                for args in csv_reader:
+                    if cls.__name__ == "Rectangle":
+                        dictionary = {"id": int(args[0]),
+                                      "width": int(args[1]),
+                                      "height": int(args[2]),
+                                      "x": int(args[3]),
+                                      "y": int(args[4])}
+                    elif cls.__name__ == "Square":
+                        dictionary = {"id": int(args[0]), "size": int(args[1]),
+                                      "x": int(args[2]), "y": int(args[3])}
+                    obj = cls.create(**dictionary)
+                    li.append(obj)
+        except Exception:
+            pass
+        return li
 
-    def __str__(self):
-        """ string representation of class """
-        string = "[{:s}] ({:d})".format(type(self).__name__, self.id)
-        string += " {:d}/{:d} ".format(self.__x, self.__y)
-        string += "- {:d}/{:d}".format(self.__width, self.__height)
-        return string
+    @staticmethod
+    def draw(list_rectangles, list_squares):
+        """
+        Draws the shape on a GUI
+        """
+        s = turtle.Screen()
+        t = turtle.Turtle()
+        cl = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"]
+        turtle.bgcolor("black")
+        t.pensize(3)
+        shapes = list_rectangles + list_squares
+        for shape in shapes:
+            t.pencolor(cl[random.randint(0, 6)])
+            t.up()
+            t.goto(shape.x, shape.y)
+            t.down()
+            t.forward(shape.width)
+            t.right(90)
+            t.forward(shape.height)
+            t.right(90)
+            t.forward(shape.width)
+            t.right(90)
+            t.forward(shape.height)
+            t.right(90)
 
-    def update(self, *args, **kwargs):
-        """ update class """
-        argCount = len(args)
-        if argCount == 0:
-            if "id" in kwargs.keys():
-                super().__init__(kwargs["id"])
-            if "width" in kwargs.keys():
-                self.width = kwargs["width"]
-            if "height" in kwargs.keys():
-                self.height = kwargs["height"]
-            if "x" in kwargs.keys():
-                self.x = kwargs["x"]
-            if "y" in kwargs.keys():
-                self.y = kwargs["y"]
-        if argCount > 0:
-            super().__init__(args[0])
-        if argCount > 1:
-            self.width = args[1]
-        if argCount > 2:
-            self.height = args[2]
-        if argCount > 3:
-            self.x = args[3]
-        if argCount > 4:
-            self.y = args[4]
-
-    def to_dictionary(self):
-        """ to dictionary """
-        dict_rec = {"x": self.__x, "y": self.__y, "id": self.id}
-        dict_rec["width"] = self.__width
-        dict_rec["height"] = self.__height
-        return dict_rec
+        s.exitonclick()
