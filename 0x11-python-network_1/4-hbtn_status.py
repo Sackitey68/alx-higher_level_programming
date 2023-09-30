@@ -1,10 +1,11 @@
 #!/usr/bin/python3
-""" Use requests to get response and print """
-import requests
+"""This python module holds a script  that fetches
+https://alx-intranet.hbtn.io/status"""
+from requests import get
 
 
 if __name__ == "__main__":
-    res = requests.get("https://intranet.hbtn.io/status")
+    result = get("https://alx-intranet.hbtn.io/status").text
     print("Body response:")
-    print("\t- type:", type(res.text))
-    print("\t- content:", res.text)
+    print("\t- type: {}".format(type(result)))
+    print("\t- content: {}".format(result))
