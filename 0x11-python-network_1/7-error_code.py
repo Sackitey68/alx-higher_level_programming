@@ -1,12 +1,13 @@
 #!/usr/bin/python3
-"""
-Accepts a URL and sends a request to the URL & displays the body of the response
-"""
-if __name__ == '__main__':
-    import requests
-    from sys import argv
-    r = requests.get(argv[1])
-    if r.status_code >= 400:
-        print("Error code: {}".format(r.status_code))
+""" Use requests to make a post and return body """
+import requests
+from sys import argv
+
+
+if __name__ == "__main__":
+    res = requests.get(argv[1])
+    code = res.status_code
+    if code > 400:
+        print("Error code:", code)
     else:
-        print(r.text)
+        print(res.text)
