@@ -1,14 +1,13 @@
 #!/usr/bin/python3
-"""
-Accepts a URL and sends a request to the URL & displays the body of the response
-"""
+""" Sends a POST request with email and return body """
+from urllib import request
+import urllib.error
+from sys import argv
+
+
 if __name__ == "__main__":
-    import urllib.error as error
-    import urllib.request as request
-    from sys import argv
-    req = request.Request(argv[1])
     try:
-        with request.urlopen(req) as r:
-            print(r.read().decode('utf-8'))
-    except error.HTTPError as e:
-        print("Error code: {}".format(e.code))
+        with request.urlopen(argv[1]) as r:
+            print(r.read().decode('UTF-8'))
+    except urllib.error.HTTPError as e:
+        print('Error code:', e.code)
