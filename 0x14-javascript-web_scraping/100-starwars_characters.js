@@ -1,52 +1,21 @@
 #!/usr/bin/node
 
-const request = require('request');
-const argv = process.argv;
-const url = 'http://swapi.co/api/films/' + argv[2];
-
-function getcharacter (theUrl) {
-  const options = {
-    url: theUrl,
-    method: 'GET',
-    headers: {
-      Accept: 'application/json',
-      'Accept-Charset': 'utf-8'
-    }
-  };
-  request(options, function (err, res, body) {
-    if (err) {
-      console.log(err);
-    } else {
-      const json = JSON.parse(body);
-      // const status = res.statusCode;
-      // console.log(json);
-      console.log(json.name);
-    }
-  });
-}
-
-function getJson (theUrl) {
-  const options = {
-    url: theUrl,
-    method: 'GET',
-    headers: {
-      Accept: 'application/json',
-      'Accept-Charset': 'utf-8'
-    }
-  };
-  request(options, function (err, res, body) {
-    if (err) {
-      console.log(err);
-    } else {
-      const json = JSON.parse(body);
-      // const status = res.statusCode;
-      // console.log(json);
-      const characters = json.characters;
-      for (const i in characters) {
-        getcharacter(characters[i]);
+const req = require('request');
+const id = process.argv[2];
+const url = 'https://swapi-api.hbtn.io/api/films/';
+req.get(url + id, function (error, res, body) {
+  if (error) {
+    console.log(error);
+  }
+  const data = JSON.parse(body);
+  const dd = data.characters;
+  for (const i of dd) {
+    req.get(i, function (error, res, body1) {
+      if (error) {
+        console.log(error);
       }
-      return json;
-    }
-  });
-}
-getJson(url);
+      const data1 = JSON.parse(body1);
+      console.log(data1.name);
+    });
+  }
+});
