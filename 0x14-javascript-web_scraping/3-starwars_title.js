@@ -1,9 +1,28 @@
 #!/usr/bin/node
+
 const request = require('request');
-const id = process.argv[2];
-request('http://swapi.co/api/films/' + id + '/', function (error, response, body) {
-  if (error == null) {
-    const json = JSON.parse(body);
-    console.log(json.title);
-  }
-});
+const argv = process.argv;
+const url = 'http://swapi.co/api/films/';
+
+function getStatusJson (theUrl) {
+  const options = {
+    url: theUrl,
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+      'Accept-Charset': 'utf-8'
+    }
+  };
+  request(options, function (err, res, body) {
+    if (err) {
+      console.log(err);
+    } else {
+      const json = JSON.parse(body);
+      const status = res.statusCode;
+      console.log(json.title);
+      return (status, json);
+    }
+  });
+}
+
+getStatusJson(url + argv[2]);
